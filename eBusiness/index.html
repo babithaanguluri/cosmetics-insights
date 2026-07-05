@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Cosmetics Insights - Analytics & Skincare Recommendations</title>
+  <meta name="description" content="Explore cosmetics market trends, Tableau dashboards, and get personalized skincare product recommendations based on your skin type.">
+  <meta name="keywords" content="cosmetics, skincare, recommendation, analytics, Tableau, moisturizer, cleanser">
+
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="assets/css/main.css" rel="stylesheet">
+
+  <!-- Custom CSS for Cosmetics Theme overrides -->
+  <style>
+    :root {
+      --accent-color: #f75c7e; /* Pink brand accent */
+      --nav-hover-color: #f75c7e;
+      --nav-dropdown-hover-color: #f75c7e;
+    }
+    
+    .sitename span {
+      color: #f75c7e !important;
+    }
+    
+    /* Brand grid styles */
+    .brand-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .brand-card {
+      background: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: 8px;
+      padding: 10px 5px;
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #333333;
+      transition: all 0.2s ease-in-out;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    }
+    .brand-card:hover {
+      border-color: #f75c7e;
+      color: #f75c7e;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(247, 92, 126, 0.1);
+    }
+    
+    /* Explore Now card styles */
+    .explore-section .explore-card {
+      background: #ffffff;
+      border: 1px solid rgba(0,0,0,0.05);
+      border-radius: 12px;
+      padding: 30px 20px;
+      text-align: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+      height: 100%;
+    }
+    .explore-section .explore-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+      border-color: rgba(247, 92, 126, 0.2);
+    }
+    .explore-section .explore-card .icon-wrapper {
+      width: 60px;
+      height: 60px;
+      background: rgba(247, 92, 126, 0.08);
+      color: #f75c7e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      margin: 0 auto 20px auto;
+      font-size: 1.5rem;
+    }
+    .explore-section .explore-card h4 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .explore-section .explore-card p {
+      font-size: 0.9rem;
+      color: #777777;
+      margin-bottom: 20px;
+    }
+    .explore-section .explore-card .btn-link {
+      color: #f75c7e;
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    
+    /* Recommendation result card styles */
+    .product-card {
+      background: #ffffff;
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 16px;
+      padding: 24px;
+      transition: all 0.3s ease;
+      height: 100%;
+      position: relative;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.02);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+      border-color: rgba(247, 92, 126, 0.3);
+    }
+    .product-card .badge-category {
+      background: rgba(247, 92, 126, 0.1);
+      color: #f75c7e;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 50px;
+      align-self: flex-start;
+      margin-bottom: 12px;
+    }
+    .product-card .product-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #2c3e50;
+    }
+    .product-card .product-brand {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #888888;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+    .product-card .product-rating {
+      color: #ffc107;
+      font-size: 0.9rem;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+    .product-card .product-price {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #2c3e50;
+    }
+    .product-card .product-ingredients {
+      font-size: 0.8rem;
+      color: #777777;
+      margin-top: 15px;
+      border-top: 1px solid rgba(0,0,0,0.05);
+      padding-top: 15px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* New Team section styles */
+    .team-member-card {
+      background: #ffffff;
+      border: 1px solid rgba(0,0,0,0.05);
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+      height: 100%;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .team-member-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+      border-color: rgba(247, 92, 126, 0.2);
+    }
+    .team-avatar {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 0 auto 15px auto;
+    }
+    .team-avatar.blue { background-color: #036dda; }
+    .team-avatar.orange { background-color: #f39c12; }
+    .team-avatar.grey { background-color: #7f8c8d; }
+    .team-avatar.green { background-color: #2ecc71; }
+    
+    .team-member-card h4 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 5px;
+      line-height: 1.4;
+    }
+    .team-member-card .role {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #f75c7e;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+    .team-member-card .email {
+      font-size: 0.8rem;
+      color: #777777;
+      margin-bottom: 0;
+      word-break: break-all;
+    }
+  </style>
+</head>
+
+<body class="index-page">
+
+  <header id="header" class="header d-flex align-items-center sticky-top">
+    <div class="container-fluid container-xl position-relative d-flex align-items-center">
+
+      <a href="index.html" class="logo d-flex align-items-center me-auto">
+        <h1 class="sitename"><span>Cosmetics</span> Insights</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="#hero" class="active">Home</a></li>
+          <li><a href="#dashboard">Dashboard</a></li>
+          <li><a href="#story">Story</a></li>
+          <li><a href="#team">Team</a></li>
+          <li><a href="#brands">Brands</a></li>
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+
+      <a class="btn-getstarted" href="#dashboard" style="background: #f75c7e; border-color: #f75c7e;">Get Started</a>
+
+    </div>
+  </header>
+
+    <main class="main">
+
+    <!-- Hero Section -->
+    <section id="hero" class="hero section">
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+        <div class="row align-items-center">
+          <div class="col-lg-6">
+            <div class="hero-content" data-aos="fade-up" data-aos-delay="200">
+              <h2>Cosmetics Recommendation System</h2>
+              <p>Select your skin type to get personalised product recommendations ranked by expert rating.</p>
+              
+              <!-- Skin Type Selection Form -->
+              <form id="recommendation-form" class="mt-4 p-4 shadow-sm rounded-4" style="background: #ffffff; border: 1px solid rgba(0,0,0,0.05);">
+                <div class="mb-4">
+                  <label for="skin-type-select" class="form-label fw-semibold mb-2">Choose Skin Type</label>
+                  <select id="skin-type-select" class="form-select py-2.5 px-3 rounded-3" style="border-color: rgba(0,0,0,0.15); transition: all 0.3s;">
+                    <option value="Combination" selected>Combination</option>
+                    <option value="Dry">Dry</option>
+                    <option value="Normal">Normal</option>
+                    <option value="Oily">Oily</option>
+                    <option value="Sensitive">Sensitive</option>
+                  </select>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2.5 rounded-3 fw-semibold transition" style="background: #f75c7e; border: none; box-shadow: 0 4px 15px rgba(247, 92, 126, 0.3);">
+                  Get Recommendation
+                </button>
+              </form>
+              
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="hero-image" data-aos="zoom-out" data-aos-delay="300">
+              <img src="assets/img/about/about-5.webp" alt="Cosmetics Recommendation" class="img-fluid rounded-4 shadow">
+            </div>
+          </div>
+        </div>
+        
+        <!-- Recommendations results container -->
+        <div id="recommendations-container" class="mt-5 d-none" data-aos="fade-up">
+          <div class="text-center mb-5">
+            <h3 class="fw-bold" style="color: #0d3035;">Top Recommended Products for <span id="selected-skin-name" style="color: #f75c7e;">Combination</span> Skin</h3>
+            <p class="text-muted">Top rated cosmetics tailored to your skin type profile</p>
+          </div>
+          <div id="recommendations-grid" class="row g-4 justify-content-center">
+            <!-- Product Cards will be dynamically injected here -->
+          </div>
+        </div>
+
+      </div>
+    </section><!-- /Hero Section -->
+
+    <!-- Explore Now Section -->
+    <section id="explore" class="explore-section section light-background py-5">
+      <div class="container" data-aos="fade-up">
+        <div class="text-center mb-5">
+          <h2 class="fw-bold">Explore Now</h2>
+          <p class="text-muted">Get started with our recommendation system, dashboards, and analytics insights</p>
+        </div>
+        <div class="row g-4 justify-content-center">
+          <div class="col-md-6 col-lg-3">
+            <div class="explore-card">
+              <div class="icon-wrapper"><i class="bi bi-house"></i></div>
+              <h4>Home</h4>
+              <p>Get personalized recommendations based on your skin type</p>
+              <a href="#hero" class="btn-link">Get Started <i class="bi bi-arrow-right"></i></a>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-3">
+            <div class="explore-card">
+              <div class="icon-wrapper"><i class="bi bi-speedometer2"></i></div>
+              <h4>Dashboard</h4>
+              <p>Visualize comprehensive cosmetics market insights and trends</p>
+              <a href="#dashboard" class="btn-link">Get Started <i class="bi bi-arrow-right"></i></a>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-3">
+            <div class="explore-card">
+              <div class="icon-wrapper"><i class="bi bi-book"></i></div>
+              <h4>Story</h4>
+              <p>Discover the narrative behind cosmetics market trends and data</p>
+              <a href="#story" class="btn-link">Get Started <i class="bi bi-arrow-right"></i></a>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-3">
+            <div class="explore-card">
+              <div class="icon-wrapper"><i class="bi bi-gem"></i></div>
+              <h4>Brands</h4>
+              <p>Explore all premium brands and discover the perfect products for you</p>
+              <a href="#brands" class="btn-link">Get Started <i class="bi bi-arrow-right"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dashboard Section -->
+    <section id="dashboard" class="dashboard section py-5">
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Dashboard</h2>
+        <p>Explore the Cosmetics Insights Dashboard</p>
+      </div>
+      <div class="container" data-aos="fade-up">
+        <div class="d-flex justify-content-center align-items-center w-100" style="background: #ffffff; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 20px;">
+          <div class='tableauPlaceholder' id='viz1783245812311' style='position: relative; width: 100%; max-width: 1200px; margin: 0 auto;'>
+            <noscript>
+              <a href='#'><img alt='Cosmetics Insights Dashboard ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Co&#47;CosmeticsInsightsDashboard_17832453320410&#47;Dashboard1&#47;1_rss.png' style='border: none' /></a>
+            </noscript>
+            <object class='tableauViz' style='display:none;'>
+              <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' />
+              <param name='embed_code_version' value='3' />
+              <param name='site_root' value='' />
+              <param name='name' value='CosmeticsInsightsDashboard_17832453320410&#47;Dashboard1' />
+              <param name='tabs' value='no' />
+              <param name='toolbar' value='yes' />
+              <param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Co&#47;CosmeticsInsightsDashboard_17832453320410&#47;Dashboard1&#47;1.png' />
+              <param name='animate_transition' value='yes' />
+              <param name='display_static_image' value='yes' />
+              <param name='display_spinner' value='yes' />
+              <param name='display_overlay' value='yes' />
+              <param name='display_count' value='yes' />
+              <param name='language' value='en-US' />
+            </object>
+          </div>
+          <script type='text/javascript'>
+            var divElement2 = document.getElementById('viz1783245812311');
+            var vizElement2 = divElement2.getElementsByTagName('object')[0];
+            if ( divElement2.offsetWidth > 800 ) { vizElement2.style.width='100%';vizElement2.style.height=(divElement2.offsetWidth*0.75)+'px';} else if ( divElement2.offsetWidth > 500 ) { vizElement2.style.width='100%';vizElement2.style.height=(divElement2.offsetWidth*0.75)+'px';} else { vizElement2.style.width='100%';vizElement2.style.height='2577px';}
+            var scriptElement2 = document.createElement('script');
+            scriptElement2.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';
+            vizElement2.parentNode.insertBefore(scriptElement2, vizElement2);
+          </script>
+        </div>
+      </div>
+    </section>
+
+    <!-- Story Section -->
+    <section id="story" class="story section light-background py-5">
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Story</h2>
+        <p>Explore the Cosmetics Insights Story</p>
+      </div>
+      <div class="container" data-aos="fade-up">
+        <div class="d-flex justify-content-center align-items-center w-100" style="background: #ffffff; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 20px;">
+          <div class='tableauPlaceholder' id='viz1783245761385' style='position: relative; width: 100%; max-width: 1016px; margin: 0 auto;'>
+            <noscript>
+              <a href='#'><img alt='Story 1 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Co&#47;Cosmeticsstory&#47;Story1&#47;1_rss.png' style='border: none' /></a>
+            </noscript>
+            <object class='tableauViz' style='display:none;'>
+              <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' />
+              <param name='embed_code_version' value='3' />
+              <param name='site_root' value='' />
+              <param name='name' value='Cosmeticsstory&#47;Story1' />
+              <param name='tabs' value='no' />
+              <param name='toolbar' value='yes' />
+              <param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Co&#47;Cosmeticsstory&#47;Story1&#47;1.png' />
+              <param name='animate_transition' value='yes' />
+              <param name='display_static_image' value='yes' />
+              <param name='display_spinner' value='yes' />
+              <param name='display_overlay' value='yes' />
+              <param name='display_count' value='yes' />
+              <param name='language' value='en-US' />
+            </object>
+          </div>
+          <script type='text/javascript'>
+            var divElement = document.getElementById('viz1783245761385');
+            var vizElement = divElement.getElementsByTagName('object')[0];
+            vizElement.style.width='1016px';
+            vizElement.style.height='991px';
+            var scriptElement = document.createElement('script');
+            scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';
+            vizElement.parentNode.insertBefore(scriptElement, vizElement);
+          </script>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section id="stats" class="stats section py-5">
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+        <div class="stats-hero row align-items-center mb-5">
+          <div class="col-lg-7 mb-4 mb-lg-0" data-aos="fade-right" data-aos-delay="200">
+            <h3 class="headline mb-3 fw-bold" style="color: #0d3035;">Discover Your Perfect Skincare Routine</h3>
+            <p class="lead">Explore our comprehensive range of cosmetics products designed for all skin types. From moisturisers to treatments, find your perfect match with our expert recommendations.</p>
+          </div>
+          <div class="col-lg-5 text-lg-end text-center" data-aos="zoom-in" data-aos-delay="300">
+            <div class="stats-rating d-inline-flex align-items-center py-3 px-4 shadow-sm" style="background: #ffffff; border-radius: 12px; border: 1px solid rgba(0,0,0,0.05);">
+              <div class="me-3 text-center">
+                <span class="fs-2 fw-bold" style="color: #f75c7e;">4.8</span><span class="text-muted">/5</span>
+              </div>
+              <div class="text-start">
+                <span class="stars" style="color: #ffc107;">
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-half"></i>
+                </span>
+                <div class="user-feedback small text-muted mt-1">Based on 70+ unique user reviews</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-counters row gy-4 justify-content-center">
+          <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="100">
+            <article class="stats-counter-card text-center p-4 shadow-sm rounded-4" style="background: #ffffff; border: 1px solid rgba(0,0,0,0.04);">
+              <div class="counter-value mb-1 fw-bold fs-3" style="color: #f75c7e;">{{ total_products }}</div>
+              <small class="label text-muted fw-semibold">Products in Database</small>
+            </article>
+          </div>
+          <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="200">
+            <article class="stats-counter-card text-center p-4 shadow-sm rounded-4" style="background: #ffffff; border: 1px solid rgba(0,0,0,0.04);">
+              <div class="counter-value mb-1 fw-bold fs-3" style="color: #f75c7e;">{{ unique_brands_count }}</div>
+              <small class="label text-muted fw-semibold">Premium Brands</small>
+            </article>
+          </div>
+          <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="300">
+            <article class="stats-counter-card text-center p-4 shadow-sm rounded-4" style="background: #ffffff; border: 1px solid rgba(0,0,0,0.04);">
+              <div class="counter-value mb-1 fw-bold fs-3" style="color: #f75c7e;">{{ unique_categories }}</div>
+              <small class="label text-muted fw-semibold">Product Categories</small>
+            </article>
+          </div>
+          <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="400">
+            <article class="stats-counter-card text-center p-4 shadow-sm rounded-4" style="background: #ffffff; border: 1px solid rgba(0,0,0,0.04);">
+              <div class="counter-value mb-1 fw-bold fs-3" style="color: #f75c7e;">{{ skin_types_count }}</div>
+              <small class="label text-muted fw-semibold">Skin Types Covered</small>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Team Section -->
+    <section id="team" class="team section py-5">
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Our Team</h2>
+        <p>Meet the dedicated members driving our cosmetics insights and recommendations</p>
+      </div>
+      <div class="container" data-aos="fade-up">
+        <div class="row g-4 justify-content-center">
+          
+          <div class="col-md-6 col-lg-3">
+            <div class="team-member-card">
+              <div>
+                <div class="team-avatar orange">BERA</div>
+                <h4>Babitha Esther Rani Anguluri</h4>
+                <div class="role">Team Lead</div>
+              </div>
+              <p class="email"><i class="bi bi-envelope me-1"></i> babithaanguluri@gmail.com</p>
+            </div>
+          </div>
+          
+          <div class="col-md-6 col-lg-3">
+            <div class="team-member-card">
+              <div>
+                <div class="team-avatar blue">AKB</div>
+                <h4>Amara Krishna Babu</h4>
+                <div class="role">Member</div>
+              </div>
+              <p class="email"><i class="bi bi-envelope me-1"></i> akrishnababu957@gmail.com</p>
+            </div>
+          </div>
+          
+          <div class="col-md-6 col-lg-3">
+            <div class="team-member-card">
+              <div>
+                <div class="team-avatar grey">HMK</div>
+                <h4>Hema Mounika Kasa</h4>
+                <div class="role">Member</div>
+              </div>
+              <p class="email"><i class="bi bi-envelope me-1"></i> hemakasa2809@gmail.com</p>
+            </div>
+          </div>
+          
+          <div class="col-md-6 col-lg-3">
+            <div class="team-member-card">
+              <div>
+                <div class="team-avatar green">MHS</div>
+                <h4>Mohammad Hameeda Shayeen</h4>
+                <div class="role">Member</div>
+              </div>
+              <p class="email"><i class="bi bi-envelope me-1"></i> mdhameeda6@gmail.com</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Brands Section -->
+    <section id="brands" class="brands section light-background py-5">
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Our Brands</h2>
+        <p>Explore all 184 premium brands in our database</p>
+      </div>
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+        <div class="brand-grid">
+          {% for brand in brands %}
+            <div class="brand-card">{{ brand }}</div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="footer" class="footer dark-background">
+
+    <div class="footer-newsletter">
+      <div class="container">
+        <div class="row justify-content-center text-center">
+          <div class="col-lg-6">
+            <h4>Join Our Newsletter</h4>
+            <p>Subscribe to our newsletter and receive the latest news about our products and services!</p>
+            <form action="forms/newsletter.php" method="post" class="php-email-form">
+              <div class="newsletter-form"><input type="email" name="email"><input type="submit" value="Subscribe"></div>
+              <div class="loading">Loading</div>
+              <div class="error-message"></div>
+              <div class="sent-message">Your subscription request has been sent. Thank you!</div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container footer-top">
+      <div class="row gy-4">
+        <div class="col-lg-4 col-md-6 footer-about">
+          <a href="index.html" class="d-flex align-items-center">
+            <span class="sitename">Cosmetics Insights</span>
+          </a>
+          <div class="footer-contact pt-3">
+            <p>A108 Adam Street</p>
+            <p>New York, NY 535022</p>
+            <p class="mt-3"><strong>Phone:</strong> <span>+1 5589 55488 55</span></p>
+            <p><strong>Email:</strong> <span>info@example.com</span></p>
+          </div>
+        </div>
+
+        <div class="col-lg-2 col-md-3 footer-links">
+          <h4>Useful Links</h4>
+          <ul>
+            <li><i class="bi bi-chevron-right"></i> <a href="#">Home</a></li>
+            <li><i class="bi bi-chevron-right"></i> <a href="#">About us</a></li>
+            <li><i class="bi bi-chevron-right"></i> <a href="#">Services</a></li>
+            <li><i class="bi bi-chevron-right"></i> <a href="#">Terms of service</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-2 col-md-3 footer-links">
+          <h4>Our Services</h4>
+          <ul>
+            <li><i class="bi bi-chevron-right"></i> <a href="#">Web Design</a></li>
+            <li><i class="bi bi-chevron-right"></i> <a href="#">Web Development</a></li>
+            <li><i class="bi bi-chevron-right"></i> <a href="#">Product Management</a></li>
+            <li><i class="bi bi-chevron-right"></i> <a href="#">Marketing</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-4 col-md-12">
+          <h4>Follow Us</h4>
+          <p>Cras fermentum odio eu feugiat lide par naso tierra videa magna derita valies</p>
+          <div class="social-links d-flex">
+            <a href=""><i class="bi bi-twitter-x"></i></a>
+            <a href=""><i class="bi bi-facebook"></i></a>
+            <a href=""><i class="bi bi-instagram"></i></a>
+            <a href=""><i class="bi bi-linkedin"></i></a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="container copyright text-center mt-4">
+      <p>© <span>Copyright</span> <strong class="px-1 sitename">Cosmetics Insights</strong> <span>All Rights Reserved</span></p>
+      <div class="credits">
+        <!-- All the links in the footer should remain intact. -->
+        <!-- You can delete the links only if you've purchased the pro version. -->
+        <!-- Licensing information: https://bootstrapmade.com/license/ -->
+        <!-- Purchase the pro version with working PHP/AJAX contact form: [buy-url] -->
+        Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a> | <a href="https://bootstrapmade.com/tools/">DevTools</a>
+      </div>
+    </div>
+
+  </footer>
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
+  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+
+  <!-- Main JS File -->
+  <script src="assets/js/main.js"></script>
+
+  <!-- AJAX recommendation form handler -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('recommendation-form');
+      const container = document.getElementById('recommendations-container');
+      const grid = document.getElementById('recommendations-grid');
+      const skinNameSpan = document.getElementById('selected-skin-name');
+
+      if (form) {
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          const select = document.getElementById('skin-type-select');
+          const skinType = select.value;
+          
+          fetch('/recommend', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ skin_type: skinType })
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.recommendations) {
+              skinNameSpan.textContent = data.skin_type;
+              grid.innerHTML = '';
+              
+              data.recommendations.forEach(prod => {
+                const cardCol = document.createElement('div');
+                cardCol.className = 'col-lg-4 col-md-6';
+                
+                const rating = prod.Rank || 0;
+                let starsHTML = '';
+                const fullStars = Math.floor(rating);
+                const hasHalf = rating % 1 >= 0.5;
+                
+                for(let i=1; i<=5; i++) {
+                  if (i <= fullStars) {
+                    starsHTML += '<i class="bi bi-star-fill text-warning me-1"></i>';
+                  } else if (i === fullStars + 1 && hasHalf) {
+                    starsHTML += '<i class="bi bi-star-half text-warning me-1"></i>';
+                  } else {
+                    starsHTML += '<i class="bi bi-star text-warning me-1"></i>';
+                  }
+                }
+                
+                cardCol.innerHTML = `
+                  <div class="product-card">
+                    <div>
+                      <span class="badge-category">${prod.Label}</span>
+                      <h4 class="product-title">${prod.Name}</h4>
+                      <div class="product-brand">${prod.Brand}</div>
+                      <div class="product-rating">
+                        ${starsHTML}
+                        <span class="ms-1 text-muted">(${rating})</span>
+                      </div>
+                    </div>
+                    <div>
+                      <div class="d-flex justify-content-between align-items-center mt-3">
+                        <span class="product-price">$${prod.Price}</span>
+                        <span class="text-success small fw-semibold"><i class="bi bi-shield-check"></i> Expert Pick</span>
+                      </div>
+                      <div class="product-ingredients" title="${prod.Ingredients}">
+                        <strong>Ingredients:</strong> ${prod.Ingredients}
+                      </div>
+                    </div>
+                  </div>
+                `;
+                grid.appendChild(cardCol);
+              });
+              
+              container.classList.remove('d-none');
+              container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          })
+          .catch(error => {
+            console.error('Error fetching recommendations:', error);
+          });
+        });
+      }
+    });
+  </script>
+
+  <!-- Custom script to trigger resize event on Tableau tab transitions to ensure responsive scaling -->
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var tabElList = [].slice.call(document.querySelectorAll('button[data-bs-toggle="tab"]'));
+      tabElList.forEach(function(tabEl) {
+        tabEl.addEventListener('shown.bs.tab', function (event) {
+          // Trigger a window resize event so Tableau recalculates layout dimensions
+          window.dispatchEvent(new Event('resize'));
+        });
+      });
+    });
+  </script>
+
+</body>
+
+</html>
