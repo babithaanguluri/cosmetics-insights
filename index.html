@@ -468,25 +468,25 @@
         <div class="stats-counters row gy-4 justify-content-center">
           <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="100">
             <article class="stats-counter-card text-center p-4 shadow-sm rounded-4" style="background: #ffffff; border: 1px solid rgba(0,0,0,0.04);">
-              <div class="counter-value mb-1 fw-bold fs-3" style="color: #f75c7e;">{{ total_products }}</div>
+              <div class="counter-value mb-1 fw-bold fs-3" style="color: #f75c7e;"><span id="stat-products">--</span></div>
               <small class="label text-muted fw-semibold">Products in Database</small>
             </article>
           </div>
           <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="200">
             <article class="stats-counter-card text-center p-4 shadow-sm rounded-4" style="background: #ffffff; border: 1px solid rgba(0,0,0,0.04);">
-              <div class="counter-value mb-1 fw-bold fs-3" style="color: #f75c7e;">{{ unique_brands_count }}</div>
+              <div class="counter-value mb-1 fw-bold fs-3" style="color: #f75c7e;"><span id="stat-brands">--</span></div>
               <small class="label text-muted fw-semibold">Premium Brands</small>
             </article>
           </div>
           <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="300">
             <article class="stats-counter-card text-center p-4 shadow-sm rounded-4" style="background: #ffffff; border: 1px solid rgba(0,0,0,0.04);">
-              <div class="counter-value mb-1 fw-bold fs-3" style="color: #f75c7e;">{{ unique_categories }}</div>
+              <div class="counter-value mb-1 fw-bold fs-3" style="color: #f75c7e;"><span id="stat-categories">--</span></div>
               <small class="label text-muted fw-semibold">Product Categories</small>
             </article>
           </div>
           <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="400">
             <article class="stats-counter-card text-center p-4 shadow-sm rounded-4" style="background: #ffffff; border: 1px solid rgba(0,0,0,0.04);">
-              <div class="counter-value mb-1 fw-bold fs-3" style="color: #f75c7e;">{{ skin_types_count }}</div>
+              <div class="counter-value mb-1 fw-bold fs-3" style="color: #f75c7e;"><span id="stat-skintypes">--</span></div>
               <small class="label text-muted fw-semibold">Skin Types Covered</small>
             </article>
           </div>
@@ -558,10 +558,8 @@
         <p>Explore all 184 premium brands in our database</p>
       </div>
       <div class="container" data-aos="fade-up" data-aos-delay="100">
-        <div class="brand-grid">
-          {% for brand in brands %}
-            <div class="brand-card">{{ brand }}</div>
-          {% endfor %}
+        <div class="brand-grid" id="brand-grid-container">
+          <div class="text-center w-100 text-muted py-3">Loading brand list...</div>
         </div>
       </div>
     </section>
@@ -667,43 +665,174 @@
   <!-- Main JS File -->
   <script src="assets/js/main.js"></script>
 
-  <!-- AJAX recommendation form handler -->
+  <!-- Client-side CSV parsing & Recommendation Handler -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const form = document.getElementById('recommendation-form');
       const container = document.getElementById('recommendations-container');
       const grid = document.getElementById('recommendations-grid');
       const skinNameSpan = document.getElementById('selected-skin-name');
+      const brandGrid = document.getElementById('brand-grid-container');
 
+      // Stats elements
+      const statProducts = document.getElementById('stat-products');
+      const statBrands = document.getElementById('stat-brands');
+      const statCategories = document.getElementById('stat-categories');
+      const statSkintypes = document.getElementById('stat-skintypes');
+
+      window.cosmeticsData = [];
+
+      // CSV parser handling quoted fields (with potential newlines/escaped quotes)
+      function parseCSV(text) {
+        const lines = [];
+        let row = [""];
+        let inQuotes = false;
+
+        for (let i = 0; i < text.length; i++) {
+          const c = text[i];
+          const next = text[i + 1];
+          if (c === '"') {
+            if (inQuotes && next === '"') {
+              row[row.length - 1] += '"';
+              i++;
+            } else {
+              inQuotes = !inQuotes;
+            }
+          } else if (c === ',' && !inQuotes) {
+            row.push("");
+          } else if ((c === '\r' || c === '\n') && !inQuotes) {
+            if (c === '\r' && next === '\n') {
+              i++;
+            }
+            lines.push(row);
+            row = [""];
+          } else {
+            row[row.length - 1] += c;
+          }
+        }
+        if (row.length > 1 || row[0] !== "") {
+          lines.push(row);
+        }
+        return lines;
+      }
+
+      // Fetch and process database locally
+      fetch('cosmetics.csv')
+        .then(response => response.text())
+        .then(csvText => {
+          const parsedLines = parseCSV(csvText);
+          if (parsedLines.length < 2) return;
+
+          const headers = parsedLines[0].map(h => h.trim());
+          const data = [];
+
+          for (let i = 1; i < parsedLines.length; i++) {
+            const row = parsedLines[i];
+            if (row.length < headers.length) continue;
+
+            const item = {};
+            headers.forEach((header, idx) => {
+              item[header] = row[idx] ? row[idx].trim() : '';
+            });
+            data.push(item);
+          }
+
+          window.cosmeticsData = data;
+
+          // Calculate statistics
+          const totalProducts = data.length;
+          
+          const uniqueBrands = new Set();
+          const uniqueLabels = new Set();
+          const brandWords = new Set();
+
+          data.forEach(item => {
+            if (item.Brand) {
+              uniqueBrands.add(item.Brand);
+              // Split brand words
+              item.Brand.split(/\s+/).forEach(w => {
+                const cleanWord = w.toUpperCase().replace(/^[,.()"]+|[,.()"]+$/g, '').trim();
+                if (cleanWord) brandWords.add(cleanWord);
+              });
+            }
+            if (item.Label) {
+              uniqueLabels.add(item.Label);
+            }
+          });
+
+          // Update statistics in UI
+          if (statProducts) statProducts.textContent = totalProducts.toLocaleString();
+          if (statBrands) statBrands.textContent = uniqueBrands.size;
+          if (statCategories) statCategories.textContent = uniqueLabels.size;
+          if (statSkintypes) statSkintypes.textContent = "5";
+
+          // Populate brands section
+          if (brandGrid) {
+            brandGrid.innerHTML = '';
+            const sortedBrands = Array.from(brandWords).sort();
+            sortedBrands.forEach(brand => {
+              const div = document.createElement('div');
+              div.className = 'brand-card';
+              div.textContent = brand;
+              brandGrid.appendChild(div);
+            });
+          }
+        })
+        .catch(err => {
+          console.error("Error loading cosmetics.csv database:", err);
+          if (brandGrid) brandGrid.innerHTML = '<div class="text-danger text-center w-100">Failed to load brand database.</div>';
+        });
+
+      // Handle Recommendation Form Submit locally
       if (form) {
         form.addEventListener('submit', function(e) {
           e.preventDefault();
           const select = document.getElementById('skin-type-select');
           const skinType = select.value;
-          
-          fetch('/recommend', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ skin_type: skinType })
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.recommendations) {
-              skinNameSpan.textContent = data.skin_type;
-              grid.innerHTML = '';
-              
-              data.recommendations.forEach(prod => {
+
+          if (!window.cosmeticsData || window.cosmeticsData.length === 0) {
+            alert("Database is still loading. Please try again in a moment.");
+            return;
+          }
+
+          // Filter by skin type column (flagged as 1)
+          const filtered = window.cosmeticsData.filter(item => {
+            return String(item[skinType]).trim() === '1';
+          });
+
+          // Sort by Rank desc, then Price asc
+          filtered.sort((a, b) => {
+            const rankA = parseFloat(a.Rank) || 0;
+            const rankB = parseFloat(b.Rank) || 0;
+            if (rankB !== rankA) {
+              return rankB - rankA; // Rank descending
+            }
+            const priceA = parseFloat(a.Price) || 0;
+            const priceB = parseFloat(b.Price) || 0;
+            return priceA - priceB; // Price ascending
+          });
+
+          // Get top 6
+          const recommendations = filtered.slice(0, 6);
+
+          // Update UI
+          if (skinNameSpan) skinNameSpan.textContent = skinType;
+          if (grid) {
+            grid.innerHTML = '';
+
+            if (recommendations.length === 0) {
+              grid.innerHTML = '<div class="col-12 text-center text-muted">No recommendations found for this skin type.</div>';
+            } else {
+              recommendations.forEach(prod => {
                 const cardCol = document.createElement('div');
                 cardCol.className = 'col-lg-4 col-md-6';
-                
-                const rating = prod.Rank || 0;
+
+                const rating = parseFloat(prod.Rank) || 0;
                 let starsHTML = '';
                 const fullStars = Math.floor(rating);
-                const hasHalf = rating % 1 >= 0.5;
-                
-                for(let i=1; i<=5; i++) {
+                const hasHalf = (rating - fullStars) >= 0.5;
+
+                for (let i = 1; i <= 5; i++) {
                   if (i <= fullStars) {
                     starsHTML += '<i class="bi bi-star-fill text-warning me-1"></i>';
                   } else if (i === fullStars + 1 && hasHalf) {
@@ -712,7 +841,7 @@
                     starsHTML += '<i class="bi bi-star text-warning me-1"></i>';
                   }
                 }
-                
+
                 cardCol.innerHTML = `
                   <div class="product-card">
                     <div>
@@ -729,22 +858,21 @@
                         <span class="product-price">$${prod.Price}</span>
                         <span class="text-success small fw-semibold"><i class="bi bi-shield-check"></i> Expert Pick</span>
                       </div>
-                      <div class="product-ingredients" title="${prod.Ingredients}">
-                        <strong>Ingredients:</strong> ${prod.Ingredients}
+                      <div class="product-ingredients" title="${prod.Ingredients || ''}">
+                        <strong>Ingredients:</strong> ${prod.Ingredients || 'N/A'}
                       </div>
                     </div>
                   </div>
                 `;
                 grid.appendChild(cardCol);
               });
-              
+            }
+
+            if (container) {
               container.classList.remove('d-none');
               container.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
-          })
-          .catch(error => {
-            console.error('Error fetching recommendations:', error);
-          });
+          }
         });
       }
     });
