@@ -4,7 +4,7 @@ Cosmetics Insights is a data-driven web application that combines market analyti
 
 ---
 
-## 🚀 Features
+## Features
 
 - **Personalized Recommendations**: Get immediate product suggestions based on your skin type (Combination, Dry, Normal, Oily, Sensitive).
 - **Interactive Dashboards**: Integrated Tableau dashboards and stories displaying product distribution, price-to-rank correlations, and brand insights.
@@ -13,7 +13,7 @@ Cosmetics Insights is a data-driven web application that combines market analyti
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 - **Backend**: Python, Flask
 - **Data Processing**: Pandas
@@ -23,7 +23,7 @@ Cosmetics Insights is a data-driven web application that combines market analyti
 
 ---
 
-## 📁 Project Directory Structure
+## Project Directory Structure
 
 ```text
 eBusiness/
@@ -42,7 +42,7 @@ eBusiness/
 
 ---
 
-## ⚙️ Installation & Setup
+## Installation & Setup
 
 To run this application locally, follow these steps:
 
@@ -73,7 +73,7 @@ pip install flask pandas
 
 ---
 
-## 🏃 Running the Application
+## Running the Application
 
 1. Change directory to the source folder containing the backend script:
    ```bash
@@ -88,7 +88,7 @@ pip install flask pandas
 
 ---
 
-## 📊 Recommendation Algorithm
+## Recommendation Algorithm
 
 The recommendation engine:
 1. Filters the dataset to isolate products flagged for the selected skin type (`Combination`, `Dry`, `Normal`, `Oily`, or `Sensitive`).
